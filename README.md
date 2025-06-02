@@ -1,6 +1,6 @@
-# 📝 Blog Sitem - [Blog Adı]
+# 📝 Blog Sitem - Melek'in Blogu
 
-Merhaba! 👋 Ben [Melek], bu proje **kişisel blog** sitemdir. Web tasarım ve geliştirme tutkusuyla hazırladığım bu site, **özgün içerikler**, **etkileşimli tasarım** ve **profesyonel kullanıcı deneyimi** sunmayı hedeflemektedir.
+Merhaba! 👋 Ben Melek, bu proje **kişisel blog** sitemdir. Web tasarım ve geliştirme tutkusuyla hazırladığım bu site, **özgün içerikler**, **etkileşimli tasarım** ve **profesyonel kullanıcı deneyimi** sunmayı hedeflemektedir.
 
 ## 🚀 Özellikler
 - 🏗️ **Modern ve şık tasarım**
