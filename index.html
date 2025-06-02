@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Melek'in Blogu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --text: #1a202c;
+      --card: white;
+      --accent: #3b82f6;
+      --tag-bg: #dbeafe;
+    }
+    html[data-theme="dark"] {
+      --bg: #1e293b;
+      --text: #f1f5f9;
+      --card: #334155;
+      --accent: #60a5fa;
+      --tag-bg: #475569;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 40px 20px;
+      transition: all 0.3s ease;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .title {
+      font-size: 3rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      cursor: default;
+    }
+    .letter {
+      transition: transform 0.2s ease, color 0.2s ease;
+      display: inline-block;
+    }
+    .letter:hover {
+      transform: scale(1.8);
+      color: var(--accent);
+    }
+    .search-filter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    input[type="text"] {
+      padding: 10px 14px;
+      font-size: 1rem;
+      width: 280px;
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      outline: none;
+      background: var(--card);
+      color: var(--text);
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .filters button {
+      padding: 8px 14px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .filters button:hover {
+      background: #2563eb;
+    }
+    .blog-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 40px auto 0;
+    }
+    .blog-card {
+      background-color: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.8s forwards;
+      text-decoration: none;
+      color: inherit;
+    }
+    .blog-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    .blog-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      transition: color 0.3s;
+    }
+    .blog-card:hover h2 {
+      color: var(--accent);
+    }
+    .blog-card p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .date {
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    .tags {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      background: var(--tag-bg);
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+    }
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--accent);
+      color: white;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 100;
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @media (max-width: 600px) {
+      .title {
+        font-size: 2rem;
+      }
+    }
+    .filters button.active {
+      background: #2563eb;
+      box-shadow: 0 0 0 2px white inset;
+    }
+    #noResults {
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-top: 30px;
+      display: none;
+    }
+    #scrollTop {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: none;
+      z-index: 99;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <select id="themeSelect" style="position: fixed; top: 20px; right: 20px; padding: 8px 12px; border-radius: 8px; z-index: 101;">
+    <option value="light">☀️ Gündüz</option>
+    <option value="dark">🌙 Gece</option>
+    <option value="auto">🌓 Sistem</option>
+  </select>
+
+  <div class="top-bar">
+    <h1 class="title" id="blogTitle"></h1>
+    <div class="search-filter">
+      <input type="text" id="searchInput" placeholder="Yazı ara...">
+      <div class="filters">
+        <button onclick="filterCategory('all')">Tümü</button>
+        <button onclick="filterCategory('yapayzeka')">Yapay Zeka</button>
+        <button onclick="filterCategory('frontend')">Frontend</button>
+        <button onclick="filterCategory('guvenlik')">Güvenlik</button>
+        <button onclick="filterCategory('motivasyon')">Motivasyon</button>
+        <button onclick="filterCategory('javascript')">JavaScript</button>
+        <button onclick="filterCategory('htmlcss')">HTML & CSS</button>
+        <button onclick="filterCategory('programlama')">Programlama</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="blog-container" id="blogContainer">
+    <a href="detail.html?id=1" class="blog-card" data-category="yapayzeka">
+      <div class="date">1 Haziran 2025</div>
+      <h2>Yapay Zeka Nereye Gidiyor?</h2>
+      <p>2025'te yapay zekada yaşanan gelişmeler ve gelecek tahminleri...</p>
+      <p style="font-size: 0.8rem; margin-top: 6px; color: gray;">⏱ 1 dk okuma</p>
+      <div class="tags"><div class="tag">AI</div><div class="tag">Etik</div></div>
+    </a>
+
+    <a href="detail.html?id=2" class="blog-card" data-category="frontend">
+      <div class="date">28 Mayıs 2025</div>
+      <h2>Frontend mi Backend mi?</h2>
+      <p>Yazılıma başlayanlar için yön seçme rehberi...</p>
+      <p style="font-size: 0.8rem; margin-top: 6px; color: gray;">⏱ 1 dk okuma</p>
+      <div class="tags"><div class="tag">HTML</div><div class="tag">Kariyer</div></div>
+    </a>
+
+    <a href="detail.html?id=3" class="blog-card" data-category="guvenlik">
+      <div class="date">15 Mayıs 2025</div>
+      <h2>Siber Güvenlik Temelleri</h2>
+      <p>Bilgisayar sistemlerini koruma yolları...</p>
+      <p style="font-size: 0.8rem; margin-top: 6px; color: gray;">⏱ 2 dk okuma</p>
+      <div class="tags"><div class="tag">Güvenlik</div><div class="tag">Siber</div></div>
+    </a>
+
+    <a href="detail.html?id=4" class="blog-card" data-category="motivasyon">
+      <div class="date">2 Mayıs 2025</div>
+      <h2>Motivasyonun Gücü</h2>
+      <p>Başarı için kendini motive etmenin yolları...</p>
+      <p style="font-size: 0.8rem; margin-top: 6px; color: gray;">⏱ 1 dk okuma</p>
+      <div class="tags"><div class="tag">Kişisel Gelişim</div></div>
+    </a>
+
+    <a href="detail.html?id=5" class="blog-card" data-category="javascript">
+      <div class="date">30 Nisan 2025</div>
+      <h2>JavaScript'te Fonksiyonlar</h2>
+      <p>Fonksiyonları nasıl daha verimli kullanırsın?</p>
+      <p style="font-size: 0.8rem; margin-top: 6px; color: gray;">⏱ 1 dk okuma</p>
+      <div class="tags"><div class="tag">JS</div></div>
+    </a>
+
+    <a href="detail.html?id=6" class="blog-card" data-category="htmlcss">
+      <div class="date">25 Nisan 2025</div>
+      <h2>CSS Grid ile Layout Tasarımı</h2>
+      <p>Modern web tasarımlarında grid kullanımı...</p>
+      <p style="font-size: 0.8rem; margin-top: 6px; color: gray;">⏱ 2 dk okuma</p>
+      <div class="tags"><div class="tag">CSS</div><div class="tag">Tasarım</div></div>
+    </a>
+
+    <a href="detail.html?id=7" class="blog-card" data-category="programlama">
+      <div class="date">20 Nisan 2025</div>
+      <h2>Programlama Dillerine Giriş</h2>
+      <p>Hangi dili neden seçmelisin?</p>
+      <p style="font-size: 0.8rem; margin-top: 6px; color: gray;">⏱ 3 dk okuma</p>
+      <div class="tags"><div class="tag">Kodlama</div><div class="tag">Başlangıç</div></div>
+    </a>
+    <a href="detail.html?id=8" class="blog-card" data-category="motivasyon">
+      <div class="date">15 Nisan 2025</div>
+      <h2>Kariyer Planlaması</h2>
+      <p>Başarılı bir kariyer için adımlar...</p>
+      <p style="font-size: 0.8rem; margin-top: 6px; color: gray;">⏱ 2 dk okuma</p>
+      <div class="tags"><div class="tag">Kariyer</div><div class="tag">Planlama</div>
+  </div>
+
+  <div id="noResults">Üzgünüz, aradığınız yazı bulunamadı.</div>
+
+  <button id="scrollTop" title="Yukarı çık">↑ Yukarı</button>
+
+  <script>
+    const blogTitle = document.getElementById('blogTitle');
+    const titleText = "Melek'in Blogu";
+    // Yazıyı tek tek span içinde oluşturalım
+    blogTitle.innerHTML = '';
+    for (let ch of titleText) {
+      const span = document.createElement('span');
+      span.textContent = ch;
+      span.classList.add('letter');
+      blogTitle.appendChild(span);
+    }
+
+    const blogContainer = document.getElementById('blogContainer');
+    const searchInput = document.getElementById('searchInput');
+    const filterButtons = document.querySelectorAll('.filters button');
+    const noResults = document.getElementById('noResults');
+    const scrollTopBtn = document.getElementById('scrollTop');
+
+    // Tema seçici ve localStorage yönetimi
+    const themeSelect = document.getElementById('themeSelect');
+
+    // Sayfa yüklendiğinde kaydedilmiş temayı uygula ve select seçeneğini ayarla
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("theme") || "auto";
+      themeSelect.value = savedTheme;
+      applyTheme(savedTheme);
+    });
+
+    function applyTheme(value) {
+      if (value === "auto") {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+      } else {
+        document.documentElement.setAttribute("data-theme", value);
+      }
+    }
+
+    themeSelect.addEventListener("change", () => {
+      const value = themeSelect.value;
+      applyTheme(value);
+      localStorage.setItem("theme", value);
+    });
+
+    // Sistem tema değişimlerini otomatik takip et
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if(themeSelect.value === "auto"){
+        applyTheme("auto");
+      }
+    });
+
+    // Filtreleme fonksiyonu
+    let currentCategory = 'all';
+    function filterCategory(category) {
+      currentCategory = category;
+      filterButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(category) || category === 'all' && btn.textContent === 'Tümü');
+      });
+      filterAndSearch();
+    }
+
+    // Arama ve kategori filtresini birlikte uygula
+    function filterAndSearch() {
+      const searchText = searchInput.value.toLowerCase().trim();
+      let visibleCount = 0;
+      const cards = blogContainer.querySelectorAll('.blog-card');
+
+      cards.forEach(card => {
+        const title = card.querySelector('h2').textContent.toLowerCase();
+        const category = card.getAttribute('data-category').toLowerCase();
+
+        const matchesCategory = (currentCategory === 'all' || currentCategory === category);
+        const matchesSearch = title.includes(searchText);
+
+        if (matchesCategory && matchesSearch) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', filterAndSearch);
+
+    // Scroll to top butonu
+    window.addEventListener('scroll', () => {
+      scrollTopBtn.style.display = window.scrollY > 200 ? 'block' : 'none';
+    });
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Başlangıçta tüm kategoriyi seç
+    filterCategory('all');
+  </script>
+</body>
+</html>
